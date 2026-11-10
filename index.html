@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portofolio System - Adit Satria Wibowo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: #020608;
+      color: #e2e8f0;
+      overflow-x: hidden;
+    }
+    .font-orbitron { font-family: 'Orbitron', sans-serif; }
+    .font-mono-tech { font-family: 'Share Tech Mono', monospace; }
+    
+    /* Resident Evil Grid & Atmosphere */
+    .bg-bio-grid {
+      background-image: 
+        radial-gradient(circle at 50% 20%, rgba(220, 38, 38, 0.15) 0%, transparent 50%),
+        linear-gradient(to right, rgba(220, 38, 38, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 30px 30px, 30px 30px;
+    }
+
+    /* Glow Effects */
+    .glow-red { box-shadow: 0 0 25px rgba(220, 38, 38, 0.6); }
+    .glow-cyan { box-shadow: 0 0 20px rgba(6, 182, 212, 0.4); }
+    .text-glow-red { text-shadow: 0 0 12px rgba(239, 68, 68, 0.8); }
+    .text-glow-yellow { text-shadow: 0 0 10px rgba(234, 179, 8, 0.7); }
+
+    /* RE HUD Glass Card */
+    .re-panel {
+      background: rgba(10, 15, 26, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(220, 38, 38, 0.3);
+      box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+    }
+    .re-panel-cyan {
+      background: rgba(10, 20, 30, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    /* Rotating Biohazard Icon */
+    .bio-spin {
+      animation: spin 20s linear infinite;
+    }
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="bg-bio-grid min-h-screen relative pb-20">
+
+  <!-- Floating Virus Particles -->
+  <canvas id="bio-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+  <!-- Tombol Edit Biodata (Floating) -->
+  <button onclick="toggleModal(true)" class="fixed top-5 right-5 z-50 bg-gradient-to-r from-red-700 via-red-600 to-amber-600 hover:from-red-600 hover:to-amber-500 text-white font-orbitron font-bold text-xs px-5 py-3 rounded-md shadow-2xl glow-red flex items-center gap-2 transition-all transform hover:scale-105 border border-red-400">
+    <i class="fa-solid fa-biohazard text-amber-300 animate-pulse"></i> UBAH BIODATA & FOTO
+  </button>
+
+  <!-- STICKY NAVBAR -->
+  <header class="sticky top-0 z-40 bg-black/80 backdrop-blur-md border-b border-red-900/50 py-3">
+    <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
+      <div class="flex items-center gap-2 font-orbitron text-xs text-red-500 tracking-widest font-bold">
+        <i class="fa-solid fa-biohazard text-lg bio-spin text-red-600"></i> SYSTEM CLEARANCE: LEVEL 5
+      </div>
+      <nav class="flex gap-4 font-orbitron text-xs">
+        <a href="#hero" class="text-slate-400 hover:text-red-500 transition-colors">START</a>
+        <a href="#biodata" class="text-slate-400 hover:text-red-500 transition-colors">DOSSIER</a>
+        <a href="#pendidikan" class="text-slate-400 hover:text-red-500 transition-colors">PENDIDIKAN</a>
+        <a href="#proyek" class="text-slate-400 hover:text-red-500 transition-colors">PROYEK</a>
+        <a href="#galeri" class="text-slate-400 hover:text-red-500 transition-colors">GALERI</a>
+        <a href="#kontak" class="text-slate-400 hover:text-red-500 transition-colors">KONTAK</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="relative z-10 max-w-6xl mx-auto px-4 py-8 space-y-20">
+
+    <!-- SECTION 1: HERO / START SCREEN -->
+    <section id="hero" class="pt-6">
+      <div class="re-panel rounded-xl p-8 md:p-12 relative overflow-hidden border-t-4 border-t-red-600">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-10">
+          
+          <!-- Avatar Frame -->
+          <div class="relative group">
+            <div class="w-52 h-52 md:w-60 md:h-60 rounded-full bg-gradient-to-tr from-red-950 via-red-600 to-amber-500 p-1.5 glow-red">
+              <img id="display-avatar-hero" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80" alt="Avatar Adit" class="w-full h-full object-cover rounded-full filter contrast-125">
+            </div>
+            <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-red-700 text-white font-mono-tech text-[10px] tracking-widest px-3 py-1 rounded border border-red-400 uppercase shadow-lg">
+              SUBJECT #231091900149
+            </div>
+          </div>
+
+          <!-- Hero Content -->
+          <div class="flex-1 text-center md:text-left">
+            <div class="inline-flex items-center gap-2 bg-red-950/80 border border-red-600/50 px-3 py-1 rounded text-red-400 font-mono-tech text-xs mb-3">
+              <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span> UMBRELLA CORP PERSONNEL DATABASE
+            </div>
+            <h1 class="text-4xl md:text-6xl font-black font-orbitron tracking-tight text-white uppercase text-glow-red">
+              PORTOFOLIO <span id="display-year-1" class="text-amber-500 text-3xl md:text-5xl">2026</span>
+            </h1>
+            <p id="display-role-1" class="text-amber-400 font-orbitron text-sm md:text-base font-semibold tracking-wider uppercase mt-2 text-glow-yellow">
+              CYBERSECURITY & SYSTEM COMPUTER ENGINEER
+            </p>
+
+            <!-- Quick Info Badge -->
+            <div class="mt-4 flex flex-wrap justify-center md:justify-start gap-4 font-mono-tech text-xs text-slate-300">
+              <span class="bg-black/60 px-3 py-1 rounded border border-red-950"><i class="fa-solid fa-graduation-cap text-red-500 mr-1"></i> Universitas Pamulang</span>
+              <span class="bg-black/60 px-3 py-1 rounded border border-red-950"><i class="fa-solid fa-location-dot text-amber-500 mr-1"></i> Tangerang Selatan, Indonesia</span>
+            </div>
+
+            <!-- Game HUD Buttons -->
+            <div class="mt-8 flex flex-wrap justify-center md:justify-start gap-4 font-orbitron">
+              <a href="#biodata" class="px-8 py-2.5 bg-gradient-to-r from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 text-white text-xs font-bold tracking-widest rounded border border-red-500 transition-all transform hover:scale-105 glow-red">
+                AKSES DOSSIER
+              </a>
+              <button onclick="toggleModal(true)" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white text-xs tracking-widest rounded border border-slate-700 hover:border-amber-500 transition-all">
+                PENGATURAN STATUS
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: DETAIL BIODATA & DOSSIER -->
+    <section id="biodata" class="pt-10">
+      <div class="re-panel-cyan rounded-xl p-8 border-l-4 border-l-cyan-500">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+          
+          <!-- Identity Card -->
+          <div class="md:col-span-4 text-center">
+            <span class="text-xs font-mono-tech text-cyan-400 tracking-widest uppercase">[ CONFIDENTIAL AGENT FILE ]</span>
+            <h2 id="display-name" class="text-2xl font-black font-orbitron text-white mt-1 uppercase text-glow-cyan">
+              ADIT SATRIA WIBOWO
+            </h2>
+            <div class="mt-4 relative inline-block">
+              <img id="display-avatar-profil" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80" alt="Profil" class="w-48 h-60 object-cover rounded border border-cyan-500/50 shadow-2xl filter brightness-95">
+            </div>
+
+            <!-- Status Box Card -->
+            <div class="mt-4 bg-slate-950/80 p-3 rounded border border-cyan-500/30 text-left font-mono-tech text-xs space-y-1">
+              <div class="flex justify-between">
+                <span class="text-slate-400">STATUS OPERASIONAL:</span>
+                <span class="text-emerald-400 font-bold">AKTIF</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">NIM / AGENT ID:</span>
+                <span id="display-nim" class="text-cyan-400 font-bold">231091900149</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">CLEARANCE:</span>
+                <span class="text-amber-400 font-bold">LEVEL 5 ACCESS</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Personal Dossier Grid -->
+          <div class="md:col-span-8 space-y-6">
+            
+            <!-- Table Info Biodata -->
+            <div class="bg-slate-950/90 p-5 rounded-lg border border-slate-800">
+              <h3 class="text-xs font-orbitron text-cyan-400 tracking-wider uppercase mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-address-card"></i> BIODATA IDENTITAS DIRI
+              </h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono-tech text-xs">
+                <div class="border-b border-slate-800 pb-2">
+                  <span class="text-slate-500 block uppercase">Tempat, Tanggal Lahir</span>
+                  <span id="display-ttl" class="text-white font-bold text-sm">Tangerang, 15 Maret 2004</span>
+                </div>
+                <div class="border-b border-slate-800 pb-2">
+                  <span class="text-slate-500 block uppercase">Jenis Kelamin</span>
+                  <span id="display-gender" class="text-white font-bold text-sm">Laki-Laki</span>
+                </div>
+                <div class="border-b border-slate-800 pb-2">
+                  <span class="text-slate-500 block uppercase">Alamat Domisili</span>
+                  <span id="display-address" class="text-white font-bold text-sm">Tangerang Selatan, Banten, Indonesia</span>
+                </div>
+                <div class="border-b border-slate-800 pb-2">
+                  <span class="text-slate-500 block uppercase">Kewarganegaraan</span>
+                  <span id="display-nationality" class="text-white font-bold text-sm">Indonesia (WNI)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- About Text -->
+            <div>
+              <h3 class="text-xs font-orbitron text-cyan-400 tracking-wider uppercase mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-terminal"></i> DESKRIPSI SINGKAT DIRI
+              </h3>
+              <p id="display-bio" class="text-slate-300 text-sm leading-relaxed font-sans bg-slate-900/50 p-4 rounded border border-slate-800">
+                Mahasiswa Sistem Komputer & Cybersecurity di Universitas Pamulang (Semester 6). Spesialis dalam otomasi industri SCADA/PLC, pengembangan firmware C++ & JavaScript, serta enkripsi server database dan arsitektur jaringan aman.
+              </p>
+            </div>
+
+            <!-- Software Skills -->
+            <div>
+              <h3 class="text-xs font-orbitron text-cyan-400 tracking-wider uppercase mb-3">MODUL SKILL & TEKNOLOGI UTAMA</h3>
+              <div id="display-skills" class="flex flex-wrap gap-2">
+                <span class="bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 px-3 py-1.5 rounded text-xs font-mono-tech">C++</span>
+                <span class="bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 px-3 py-1.5 rounded text-xs font-mono-tech">JavaScript</span>
+                <span class="bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 px-3 py-1.5 rounded text-xs font-mono-tech">SCADA / PLC</span>
+                <span class="bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 px-3 py-1.5 rounded text-xs font-mono-tech">Python</span>
+                <span class="bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 px-3 py-1.5 rounded text-xs font-mono-tech">Arduino IDE</span>
+                <span class="bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 px-3 py-1.5 rounded text-xs font-mono-tech">Network Encryption</span>
+              </div>
+            </div>
+
+            <!-- Language Bars -->
+            <div>
+              <h3 class="text-xs font-orbitron text-cyan-400 tracking-wider uppercase mb-3">TINGKAT KEMAHIRAN BAHASA</h3>
+              <div class="space-y-3 font-mono-tech">
+                <div>
+                  <div class="flex justify-between text-xs text-slate-300 mb-1">
+                    <span>BAHASA INDONESIA (NATIVE)</span> <span>95%</span>
+                  </div>
+                  <div class="w-full h-2 bg-slate-900 rounded overflow-hidden border border-slate-800">
+                    <div class="h-full bg-cyan-500 rounded" style="width: 95%;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs text-slate-300 mb-1">
+                    <span>BAHASA INGGRIS (PROFESSIONAL)</span> <span>85%</span>
+                  </div>
+                  <div class="w-full h-2 bg-slate-900 rounded overflow-hidden border border-slate-800">
+                    <div class="h-full bg-cyan-500 rounded" style="width: 85%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: TIMELINE RIWAYAT PENDIDIKAN LENGKAP -->
+    <section id="pendidikan" class="pt-10">
+      <div class="re-panel rounded-xl p-8 border-l-4 border-l-red-600">
+        <h2 class="text-2xl font-black font-orbitron text-white uppercase text-glow-red mb-8 flex items-center gap-3">
+          <i class="fa-solid fa-graduation-cap text-red-500"></i> RIWAYAT PENDIDIKAN (ACADEMIC LOGS)
+        </h2>
+
+        <div class="relative border-l-2 border-red-800/60 ml-4 pl-6 space-y-8 font-mono-tech">
+          
+          <!-- Universitas -->
+          <div class="relative group">
+            <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-red-600 border-2 border-slate-950 glow-red"></div>
+            <div class="bg-slate-950/90 p-4 rounded border border-slate-800 hover:border-red-500 transition-all">
+              <span class="text-amber-400 text-xs uppercase font-bold">[ 2023 - SEKARANG ] PERGURUAN TINGGI</span>
+              <h4 id="display-edu-univ" class="font-orbitron text-base font-bold text-white mt-1">Universitas Pamulang</h4>
+              <p class="text-xs text-cyan-400 mt-0.5">S1 Sistem Komputer & Cybersecurity (Semester 6)</p>
+              <p class="text-xs text-slate-400 mt-2 font-sans">Berfokus pada keamanan infrastruktur siber, arsitektur sistem IoT, otomatisasi industri PLC/SCADA, serta enkripsi server database.</p>
+            </div>
+          </div>
+
+          <!-- SMA / SMK -->
+          <div class="relative group">
+            <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-cyan-600 border-2 border-slate-950"></div>
+            <div class="bg-slate-950/90 p-4 rounded border border-slate-800 hover:border-cyan-500 transition-all">
+              <span class="text-cyan-400 text-xs uppercase font-bold">[ 2019 - 2022 ] SEKOLAH MENENGAH ATAS / KEJURUAN</span>
+              <h4 id="display-edu-sma" class="font-orbitron text-base font-bold text-white mt-1">SMK / SMA Negeri Tangerang</h4>
+              <p class="text-xs text-cyan-400 mt-0.5">Teknik Komputer & Jaringan (TKJ) / MIPA</p>
+              <p class="text-xs text-slate-400 mt-2 font-sans">Mempelajari dasar-dasar jaringan komputer, perakitan perangkat keras, sistem operasi Linux, serta algoritma pemrograman dasar C++.</p>
+            </div>
+          </div>
+
+          <!-- SMP -->
+          <div class="relative group">
+            <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-slate-700 border-2 border-slate-950"></div>
+            <div class="bg-slate-950/90 p-4 rounded border border-slate-800">
+              <span class="text-slate-400 text-xs uppercase font-bold">[ 2016 - 2019 ] SEKOLAH MENENGAH PERTAMA</span>
+              <h4 id="display-edu-smp" class="font-orbitron text-base font-bold text-white mt-1">SMP Negeri Tangerang</h4>
+              <p class="text-xs text-slate-400 mt-0.5">Pendidikan Menengah Pertama</p>
+            </div>
+          </div>
+
+          <!-- SD -->
+          <div class="relative group">
+            <div class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-slate-800 border-2 border-slate-950"></div>
+            <div class="bg-slate-950/90 p-4 rounded border border-slate-800">
+              <span class="text-slate-500 text-xs uppercase font-bold">[ 2010 - 2016 ] SEKOLAH DASAR</span>
+              <h4 id="display-edu-sd" class="font-orbitron text-base font-bold text-white mt-1">SD Negeri Tangerang</h4>
+              <p class="text-xs text-slate-400 mt-0.5">Pendidikan Dasar Utama</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: RECAP PROJECT -->
+    <section id="proyek" class="pt-10">
+      <div class="re-panel rounded-xl p-8 border-t-4 border-t-amber-500">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-2xl font-black font-orbitron text-white uppercase text-glow-yellow flex items-center gap-3">
+            RECAP PROJECT <span class="project-year-label text-slate-400 font-light">2026</span>
+          </h2>
+          <span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 text-[10px] font-mono-tech px-3 py-1 rounded uppercase">
+            MISSION LOGS
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="bg-slate-950/90 rounded border border-slate-800 hover:border-red-500 transition-all overflow-hidden group">
+            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80" alt="SCADA" class="w-full h-44 object-cover group-hover:scale-105 transition-transform">
+            <div class="p-4">
+              <h4 class="font-orbitron text-sm font-bold text-white group-hover:text-red-400">SCADA Automation System</h4>
+              <p class="text-xs text-slate-400 mt-1 font-sans">Sistem monitoring otomatisasi industri berbasis mikrokontroler & MQTT.</p>
+            </div>
+          </div>
+          <div class="bg-slate-950/90 rounded border border-slate-800 hover:border-red-500 transition-all overflow-hidden group">
+            <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80" alt="Security" class="w-full h-44 object-cover group-hover:scale-105 transition-transform">
+            <div class="p-4">
+              <h4 class="font-orbitron text-sm font-bold text-white group-hover:text-red-400">Secure Database Encryption</h4>
+              <p class="text-xs text-slate-400 mt-1 font-sans">Protokol enkripsi database lokal untuk keamanan server dari serangan siber.</p>
+            </div>
+          </div>
+          <div class="bg-slate-950/90 rounded border border-slate-800 hover:border-red-500 transition-all overflow-hidden group">
+            <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80" alt="Dashboard" class="w-full h-44 object-cover group-hover:scale-105 transition-transform">
+            <div class="p-4">
+              <h4 class="font-orbitron text-sm font-bold text-white group-hover:text-red-400">Web Cyber Dashboard</h4>
+              <p class="text-xs text-slate-400 mt-1 font-sans">Antarmuka interaktif bertema sci-fi menggunakan Tailwind CSS & JavaScript.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: VISUAL GALERI & ASSETS -->
+    <section id="galeri" class="pt-10">
+      <div class="re-panel rounded-xl p-8 border-l-4 border-l-cyan-500">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-2xl font-black font-orbitron text-white uppercase text-glow-cyan flex items-center gap-3">
+            VISUAL GALLERY & ASSETS
+          </h2>
+          <span class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 text-[10px] font-mono-tech px-3 py-1 rounded uppercase">
+            LABORATORY MEDIA
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div class="relative group overflow-hidden rounded border border-cyan-950">
+            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80" alt="Cyber Security Lab" class="w-full h-40 object-cover group-hover:scale-110 transition-transform">
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+            <span class="absolute bottom-2 left-2 text-[10px] font-mono-tech text-amber-400">#01 CYBER SECURITY LAB</span>
+          </div>
+          <div class="relative group overflow-hidden rounded border border-cyan-950">
+            <img src="https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&w=600&q=80" alt="Code Terminal" class="w-full h-40 object-cover group-hover:scale-110 transition-transform">
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+            <span class="absolute bottom-2 left-2 text-[10px] font-mono-tech text-cyan-400">#02 C++ TERMINAL</span>
+          </div>
+          <div class="relative group overflow-hidden rounded border border-cyan-950">
+            <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80" alt="Hardware Circuit" class="w-full h-40 object-cover group-hover:scale-110 transition-transform">
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+            <span class="absolute bottom-2 left-2 text-[10px] font-mono-tech text-red-400">#03 IOT HARDWARE</span>
+          </div>
+          <div class="relative group overflow-hidden rounded border border-cyan-950">
+            <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80" alt="Server Room" class="w-full h-40 object-cover group-hover:scale-110 transition-transform">
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+            <span class="absolute bottom-2 left-2 text-[10px] font-mono-tech text-amber-400">#04 SERVER ROOM</span>
+          </div>
+          <div class="relative group overflow-hidden rounded border border-cyan-950">
+            <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&q=80" alt="SCADA PLC" class="w-full h-40 object-cover group-hover:scale-110 transition-transform">
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+            <span class="absolute bottom-2 left-2 text-[10px] font-mono-tech text-cyan-400">#05 SCADA & PLC PANEL</span>
+          </div>
+          <div class="relative group overflow-hidden rounded border border-cyan-950">
+            <img src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=600&q=80" alt="Network HUD" class="w-full h-40 object-cover group-hover:scale-110 transition-transform">
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+            <span class="absolute bottom-2 left-2 text-[10px] font-mono-tech text-red-400">#06 NETWORK ENCRYPTION HUD</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: CONTACT & THANK YOU -->
+    <section id="kontak" class="pt-10">
+      <div class="re-panel rounded-xl p-8 border-b-4 border-b-red-600">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          
+          <div>
+            <h2 class="text-2xl font-black font-orbitron text-white uppercase text-glow-red mb-6">
+              SALURAN KONTAK
+            </h2>
+            <div class="space-y-4">
+              <a href="https://instagram.com" target="_blank" class="flex items-center gap-4 bg-slate-900/80 p-3 rounded border border-slate-800 hover:border-red-500 transition-all group">
+                <div class="w-10 h-10 rounded bg-red-600/20 text-red-400 flex items-center justify-center text-lg"><i class="fa-brands fa-instagram"></i></div>
+                <div>
+                  <p class="text-[10px] text-slate-400 font-mono-tech">INSTAGRAM</p>
+                  <p id="soc-ig" class="text-sm font-bold text-white group-hover:text-red-400 font-orbitron">@aditsatriaw</p>
+                </div>
+              </a>
+              <a href="https://github.com" target="_blank" class="flex items-center gap-4 bg-slate-900/80 p-3 rounded border border-slate-800 hover:border-red-500 transition-all group">
+                <div class="w-10 h-10 rounded bg-amber-600/20 text-amber-400 flex items-center justify-center text-lg"><i class="fa-brands fa-github"></i></div>
+                <div>
+                  <p class="text-[10px] text-slate-400 font-mono-tech">GITHUB</p>
+                  <p class="text-sm font-bold text-white group-hover:text-red-400 font-orbitron">aditsatria</p>
+                </div>
+              </a>
+              <a href="mailto:adit@student.unpam.ac.id" class="flex items-center gap-4 bg-slate-900/80 p-3 rounded border border-slate-800 hover:border-red-500 transition-all group">
+                <div class="w-10 h-10 rounded bg-cyan-600/20 text-cyan-400 flex items-center justify-center text-lg"><i class="fa-solid fa-envelope"></i></div>
+                <div>
+                  <p class="text-[10px] text-slate-400 font-mono-tech">EMAIL AKADEMIK</p>
+                  <p id="soc-email" class="text-sm font-bold text-white group-hover:text-red-400 font-orbitron">adit@student.unpam.ac.id</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="text-center md:text-right space-y-3">
+            <h2 class="text-4xl md:text-5xl font-black font-orbitron text-white uppercase tracking-wider text-glow-red">
+              TERIMA KASIH
+            </h2>
+            <p class="project-year-label text-2xl font-orbitron text-amber-500 font-bold">2026</p>
+            <div class="inline-block p-3 rounded bg-red-950/60 border border-red-600/40 text-red-300 text-xs font-mono-tech uppercase">
+              <i class="fa-solid fa-biohazard text-red-500 mr-1"></i> UMBRELLA CORP SECURITY VERIFIED
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL EDIT BIODATA & FOTO -->
+  <div id="editor-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="re-panel w-full max-w-2xl rounded-xl p-6 md:p-8 max-h-[90vh] overflow-y-auto border border-red-500 shadow-2xl">
+      <div class="flex justify-between items-center mb-6 border-b border-red-900/50 pb-3">
+        <h3 class="font-orbitron font-bold text-base text-red-400 flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-amber-400"></i> PENGATURAN DOSSIER BIODATA LENGKAP
+        </h3>
+        <button onclick="toggleModal(false)" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+      </div>
+
+      <form onsubmit="saveBiodata(event)" class="space-y-4 text-xs font-mono-tech">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-300 mb-1">NAMA LENGKAP</label>
+            <input type="text" id="input-name" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white font-sans" value="ADIT SATRIA WIBOWO">
+          </div>
+          <div>
+            <label class="block text-slate-300 mb-1">NIM / AGENT ID</label>
+            <input type="text" id="input-nim" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white font-sans" value="231091900149">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-300 mb-1">TEMPAT, TANGGAL LAHIR</label>
+            <input type="text" id="input-ttl" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white font-sans" value="Tangerang, 15 Maret 2004">
+          </div>
+          <div>
+            <label class="block text-slate-300 mb-1">JENIS KELAMIN</label>
+            <input type="text" id="input-gender" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white font-sans" value="Laki-Laki">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-300 mb-1">ALAMAT DOMISILI</label>
+            <input type="text" id="input-address" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white font-sans" value="Tangerang Selatan, Banten, Indonesia">
+          </div>
+          <div>
+            <label class="block text-slate-300 mb-1">TAHUN PORTOFOLIO</label>
+            <input type="text" id="input-year" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white font-sans" value="2026">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 mb-1">JABATAN / ROLE</label>
+          <input type="text" id="input-role" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white font-sans" value="CYBERSECURITY & SYSTEM COMPUTER ENGINEER">
+        </div>
+
+        <!-- Unggah Foto File Local / URL -->
+        <div class="p-3 bg-red-950/40 rounded border border-red-900/60 space-y-2">
+          <label class="block text-amber-400 font-bold">UNGGAH FOTO PROFIL (HP/LAPTOP)</label>
+          <input type="file" id="input-file-photo" accept="image/*" class="w-full text-slate-300 text-xs file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-bold file:bg-red-600 file:text-white hover:file:bg-red-500 cursor-pointer">
+          <p class="text-[10px] text-slate-400">Atau URL Gambar Online:</p>
+          <input type="text" id="input-avatar" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white font-sans text-xs" placeholder="https://...">
+        </div>
+
+        <div>
+          <label class="block text-slate-300 mb-1">DESKRIPSI DIRI (BIO)</label>
+          <textarea id="input-bio" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white font-sans text-xs">Mahasiswa Sistem Komputer & Cybersecurity di Universitas Pamulang (Semester 6). Spesialis dalam otomasi industri SCADA/PLC, pengembangan firmware C++ & JavaScript, serta enkripsi server database dan arsitektur jaringan aman.</textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-slate-300 mb-1">SKILL (Pisahkan koma)</label>
+            <input type="text" id="input-skills" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white font-sans text-xs" value="C++, JavaScript, SCADA / PLC, Python, Arduino IDE, Network Encryption">
+          </div>
+          <div>
+            <label class="block text-slate-300 mb-1">INSTAGRAM HANDLE</label>
+            <input type="text" id="input-ig" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white font-sans text-xs" value="@aditsatriaw">
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+          <button type="button" onclick="toggleModal(false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded">Batal</button>
+          <button type="submit" class="px-6 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded shadow-lg glow-red font-orbitron">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT PARTICLES & EDIT SYSTEM -->
+  <script>
+    function toggleModal(show) {
+      document.getElementById('editor-modal').classList.toggle('hidden', !show);
+    }
+
+    function saveBiodata(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('input-name').value;
+      const nim = document.getElementById('input-nim').value;
+      const ttl = document.getElementById('input-ttl').value;
+      const gender = document.getElementById('input-gender').value;
+      const address = document.getElementById('input-address').value;
+      const year = document.getElementById('input-year').value;
+      const role = document.getElementById('input-role').value;
+      const bio = document.getElementById('input-bio').value;
+      const skillsStr = document.getElementById('input-skills').value;
+      const ig = document.getElementById('input-ig').value;
+      const avatarUrl = document.getElementById('input-avatar').value;
+      const fileInput = document.getElementById('input-file-photo');
+
+      document.getElementById('display-name').innerText = name;
+      document.getElementById('display-nim').innerText = nim;
+      document.getElementById('display-ttl').innerText = ttl;
+      document.getElementById('display-gender').innerText = gender;
+      document.getElementById('display-address').innerText = address;
+      document.getElementById('display-year-1').innerText = year;
+      document.querySelectorAll('.project-year-label').forEach(el => el.innerText = year);
+      document.getElementById('display-role-1').innerText = role;
+      document.getElementById('display-bio').innerText = bio;
+      document.getElementById('soc-ig').innerText = ig;
+
+      // Update Skill Badges
+      const skillsContainer = document.getElementById('display-skills');
+      skillsContainer.innerHTML = '';
+      skillsStr.split(',').forEach(skill => {
+        if(skill.trim()) {
+          const span = document.createElement('span');
+          span.className = "bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 px-3 py-1.5 rounded text-xs font-mono-tech";
+          span.innerText = skill.trim();
+          skillsContainer.appendChild(span);
+        }
+      });
+
+      // Handle File Upload or URL
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('display-avatar-hero').src = e.target.result;
+          document.getElementById('display-avatar-profil').src = e.target.result;
+        }
+        reader.readAsDataURL(fileInput.files[0]);
+      } else if (avatarUrl.trim() !== '') {
+        document.getElementById('display-avatar-hero').src = avatarUrl;
+        document.getElementById('display-avatar-profil').src = avatarUrl;
+      }
+
+      toggleModal(false);
+    }
+
+    // Bio-hazard Particles Canvas
+    const canvas = document.getElementById('bio-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    for (let i = 0; i < 45; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 2,
+        color: Math.random() > 0.4 ? 'rgba(220, 38, 38, 0.4)' : 'rgba(234, 179, 8, 0.3)',
+        speedX: (Math.random() - 0.5) * 0.5,
+        speedY: (Math.random() - 0.5) * 0.5
+      });
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+  </script>
+</body>
+</html>
