@@ -209,7 +209,135 @@
       toggleModal(false);
     }
 
-    // Tambahkan tombol Reset Default otomatis di sebelah tombol Simpan Perubahan
+    // --- SIMULASI HMI SCADA ---
+    const SCADA_LOG_KEY = "scada_hmi_event_logs_v1";
+    const scadaState = {
+      temp: 27.5,
+      fanOn: false,
+      pumpOn: false,
+      autoMode: true,
+      logs: []
+    };
+
+    function nowScadaTime() {
+      return new Date().toTimeString().split(" ")[0];
+    }
+
+    function saveScadaLogs() {
+      try {
+        localStorage.setItem(SCADA_LOG_KEY, JSON.stringify(scadaState.logs.slice(0, 30)));
+      } catch (err) {}
+    }
+
+    function renderScadaLogs() {
+      const box = document.getElementById("hmi-event-log");
+      if (!box) return;
+      box.innerHTML = scadaState.logs
+        .map((line) => `<div class="border-b border-slate-900 pb-0.5">${escapeHtml(line)}</div>`)
+        .join("");
+    }
+
+    function addScadaLog(tag, message) {
+      scadaState.logs.unshift(`[${nowScadaTime()}] [${tag}] ${message}`);
+      scadaState.logs = scadaState.logs.slice(0, 30);
+      saveScadaLogs();
+      renderScadaLogs();
+    }
+
+    function loadScadaLogs() {
+      try {
+        const raw = localStorage.getItem(SCADA_LOG_KEY);
+        if (raw) scadaState.logs = JSON.parse(raw);
+      } catch (err) {}
+      if (!Array.isArray(scadaState.logs) || scadaState.logs.length === 0) {
+        scadaState.logs = [];
+        addScadaLog("SYSTEM", "HMI SCADA initialized. Polling RTU-01 normal.");
+      } else {
+        renderScadaLogs();
+      }
+    }
+
+    function renderHMI() {
+      const tempEl = document.getElementById("hmi-temp");
+      const alarmEl = document.getElementById("hmi-alarm-tag");
+      const fanEl = document.getElementById("hmi-fan-status");
+      const pumpEl = document.getElementById("hmi-pump-status");
+      const modeBtn = document.getElementById("hmi-mode-btn");
+      const badgeEl = document.getElementById("scada-mini-badge");
+
+      const isAlarm = scadaState.temp >= 33.0;
+
+      if (tempEl) {
+        tempEl.textContent = `${scadaState.temp.toFixed(1)}°C`;
+        tempEl.className = `text-2xl font-bold ${isAlarm ? "text-red-500 animate-pulse" : "text-cyan-400"}`;
+      }
+      if (alarmEl) {
+        alarmEl.textContent = isAlarm ? "HIGH TEMP ALARM" : "NORMAL";
+        alarmEl.className = isAlarm
+          ? "text-[10px] px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-500/60 font-bold"
+          : "text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-600/40";
+      }
+      if (fanEl) {
+        fanEl.textContent = scadaState.fanOn ? "RUNNING / ON" : "STANDBY / OFF";
+        fanEl.className = `text-sm font-bold ${scadaState.fanOn ? "text-emerald-400" : "text-amber-400"}`;
+      }
+      if (pumpEl) {
+        pumpEl.textContent = scadaState.pumpOn ? "RUNNING / ON" : "STANDBY / OFF";
+        pumpEl.className = `text-sm font-bold ${scadaState.pumpOn ? "text-emerald-400" : "text-amber-400"}`;
+      }
+      if (modeBtn) {
+        modeBtn.textContent = scadaState.autoMode ? "AUTO THRESHOLD" : "MANUAL OVERRIDE";
+      }
+      if (badgeEl) {
+        badgeEl.textContent = isAlarm ? "● ALARM SUHU" : "● HMI READY";
+        badgeEl.className = `font-mono-tech text-[10px] uppercase ${isAlarm ? "text-red-400" : "text-emerald-400"}`;
+      }
+    }
+
+    function toggleScadaModal(show) {
+      const modal = document.getElementById("scada-hmi-modal");
+      if (!modal) return;
+      modal.classList.toggle("hidden", !show);
+      if (show) renderHMI();
+    }
+
+    function toggleActuator(type) {
+      if (type === "fan") {
+        scadaState.fanOn = !scadaState.fanOn;
+        addScadaLog("CONTROL", `COOLING FAN diubah ke ${scadaState.fanOn ? "ON" : "OFF"}`);
+      } else if (type === "pump") {
+        scadaState.pumpOn = !scadaState.pumpOn;
+        addScadaLog("CONTROL", `CHILLER PUMP diubah ke ${scadaState.pumpOn ? "ON" : "OFF"}`);
+      }
+      renderHMI();
+    }
+
+    function toggleControlMode() {
+      scadaState.autoMode = !scadaState.autoMode;
+      addScadaLog("MODE", `Mode kontrol beralih ke ${scadaState.autoMode ? "AUTO THRESHOLD" : "MANUAL OVERRIDE"}`);
+      renderHMI();
+    }
+
+    function injectHeatSpike() {
+      scadaState.temp = +(scadaState.temp + 4.5).toFixed(1);
+      addScadaLog("SIMULATION", `Lonjakan beban terdeteksi (+4.5°C) -> Suhu ${scadaState.temp.toFixed(1)}°C`);
+      if (scadaState.temp >= 33.0) {
+        addScadaLog("ALARM", `HIGH TEMP TRIP (${scadaState.temp.toFixed(1)}°C >= 33.0°C)`);
+        if (scadaState.autoMode) {
+          scadaState.fanOn = true;
+          scadaState.pumpOn = true;
+          addScadaLog("AUTO-ACT", "Cooling Fan & Chiller Pump diaktifkan otomatis oleh sistem SCADA");
+        }
+      }
+      renderHMI();
+    }
+
+    function clearScadaLogs() {
+      scadaState.logs = [];
+      saveScadaLogs();
+      addScadaLog("SYSTEM", "Event log dibersihkan");
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       const saved = loadSavedProfile();
       if (saved) {
@@ -227,6 +355,29 @@
         resetBtn.addEventListener("click", resetBiodataDefault);
         actionBar.prepend(resetBtn);
       }
+
+      // Inisialisasi Simulasi HMI SCADA
+      loadScadaLogs();
+      renderHMI();
+
+      setInterval(() => {
+        const coolingEffect = (scadaState.fanOn ? -0.35 : 0) + (scadaState.pumpOn ? -0.45 : 0);
+        const drift = (Math.random() - 0.45) * 0.6 + coolingEffect;
+        scadaState.temp = Math.min(45.0, Math.max(21.0, +(scadaState.temp + drift).toFixed(1)));
+
+        if (scadaState.autoMode) {
+          if (scadaState.temp >= 33.0 && (!scadaState.fanOn || !scadaState.pumpOn)) {
+            scadaState.fanOn = true;
+            scadaState.pumpOn = true;
+            addScadaLog("AUTO-ACT", `Suhu ${scadaState.temp.toFixed(1)}°C: Aktuator pendingin ON`);
+          } else if (scadaState.temp <= 28.0 && (scadaState.fanOn || scadaState.pumpOn)) {
+            scadaState.fanOn = false;
+            scadaState.pumpOn = false;
+            addScadaLog("AUTO-ACT", `Suhu stabil (${scadaState.temp.toFixed(1)}°C): Aktuator pendingin STANDBY`);
+          }
+        }
+        renderHMI();
+      }, 2500);
 
       // Partikel latar belakang ringan pada #bio-canvas
       const canvas = document.getElementById("bio-canvas");
